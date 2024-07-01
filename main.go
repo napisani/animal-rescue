@@ -31,17 +31,17 @@ func main() {
 		slog.SetLogLoggerLevel(slog.LevelDebug)
 	}
 
+	err := DeleteTempSnippetsFile()
+	if err != nil {
+		slog.Error("Failed to delete temp snippets file %v", ErrAttr(err))
+		panic(err)
+	}
+	err = DeleteTempConfigFile()
+	if err != nil {
+		slog.Error("Failed to delete temp config file %v", ErrAttr(err))
+		panic(err)
+	}
 	if args.Clean {
-		err := DeleteTempSnippetsFile()
-		if err != nil {
-			slog.Error("Failed to delete temp snippets file %v", ErrAttr(err))
-			panic(err)
-		}
-		err = DeleteTempConfigFile()
-		if err != nil {
-			slog.Error("Failed to delete temp config file %v", ErrAttr(err))
-			panic(err)
-		}
 		return
 	}
 
