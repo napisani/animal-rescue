@@ -65,6 +65,7 @@ func FindFileVariation(cwd string, fileVariations []string) string {
 
 func FindProjectRoot(cwd string) string {
   for {
+    slog.Debug("Checking %s", cwd)
     if DoesFileExist(path.Join(cwd, ".git")) {
       return cwd
     }

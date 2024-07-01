@@ -17,6 +17,10 @@ type PackageJson struct {
 func (s *SourceNpm) GetSnippets(opts *GetSnippetsOptions) (*snippets, error) {
 	snips := snippets{}
 	f := FindFileVariation(opts.Cwd, []string{"package.json"})
+	if f == "" {
+		return &snips, nil
+	}
+
 	isPnpm := DoesFileExistAtRoot(opts.Cwd, "pnpm-lock.yaml")
 
 	if _, err := os.Stat(f); os.IsNotExist(err) {
@@ -38,22 +42,21 @@ func (s *SourceNpm) GetSnippets(opts *GetSnippetsOptions) (*snippets, error) {
 		slog.Debug("Error unmarshalling package.json: %v", err)
 		return nil, err
 	}
-  return SnippetsFromPackageJson(p, isPnpm), nil
+	return SnippetsFromPackageJson(p, isPnpm), nil
 }
 
 func SnippetsFromPackageJson(p PackageJson, isPnpm bool) *snippets {
-  cmd := "npm"
-  if isPnpm {
-    cmd = "pnpm"
-  }
-  snips := snippets{}
-  for k, _ := range p.Scripts {
-    snips.Snippets = append(snips.Snippets, Snippet{
-      Description: fmt.Sprintf("package.json: %s run %s", cmd, k),
-      Command:     fmt.Sprintf("%s run %s", cmd, k),
-      Tag:         []string{cmd, "package.json", k},
-    })
-  }
-  return &snips
+	cmd := "npm"
+	if isPnpm {
+		cmd = "pnpm"
+	}
+	snips := snippets{}
+	for k, _ := range p.Scripts {
+		snips.Snippets = append(snips.Snippets, Snippet{
+			Description: fmt.Sprintf("package.json: %s run %s", cmd, k),
+			Command:     fmt.Sprintf("%s run %s", cmd, k),
+			Tag:         []string{cmd, "package.json", k},
+		})
+	}
+	return &snips
 }
-
