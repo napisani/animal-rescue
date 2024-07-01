@@ -26,12 +26,15 @@ func (s *SourceMake) GetSnippets(opts *GetSnippetsOptions) (*snippets, error) {
 		return &snips, nil
 	}
 
-	cmd := exec.Command("make", "-p")
+	cmd := exec.Command("make", "-qp")
 	output, err := cmd.Output()
-	// slog.Debug("output %v", string(output))
-	if err != nil {
-		return nil, err
-	}
+	slog.Debug("make err %v", ErrAttr(err))
+
+  if output == nil  && err != nil {
+    // only return an error if no output was returned
+    // make seems to return a non-zero exit code when printing in question-mode
+    return &snips, err
+  }
 
 	for _, line := range strings.Split(string(output), "\n") {
 		reg := regexp.MustCompile("^[a-zA-Z0-9][^$#\\/\\t=]*:([^=]|$)")
