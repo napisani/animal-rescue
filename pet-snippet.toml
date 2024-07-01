@@ -1,0 +1,6 @@
+[[snippets]]
+  description = "local"
+  command = "date"
+  tag = ["local", "cmd" ]
+  output = ""
+

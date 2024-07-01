@@ -1,0 +1,22 @@
+{
+  "name": "",
+  "version": "1.0.0",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "prepare": "husky install ./.husky",
+    "start": "pnpm --if-present  --parallel run start",
+    "backend:start": "pnpm --if-present --filter backend run start",
+    "frontend:start": "pnpm --if-present --filter frontend run start",
+    "backend:build": "pnpm --if-present --filter backend run build",
+    "backend:test": "pnpm --if-present --filter backend run test",
+    "backend:test:int": "pnpm --if-present --filter backend run test:int",
+    "frontend:build": "pnpm --if-present --filter frontend run build",
+    "frontend:test-ci": "pnpm --if-present --filter frontend run test-ci",
+    "frontend:test": "pnpm --if-present --filter @frontend run test",
+    "frontend:build--in-theory": "pnpm --if-present --filter @frontend run build",
+    "frontend:build--prod-363810": "pnpm --if-present --filter @frontend run build",
+    "frontend:build-prod": "pnpm --if-present --filter @frontend run build-prod",
+    "frontend:build-dev": "pnpm --if-present --filter @frontend run build-dev",
+    "frontend:build-qa": "pnpm --if-present --filter @frontend run build-qa"
+  }
+}
