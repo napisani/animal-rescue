@@ -5,17 +5,15 @@ import (
 )
 
 type snippets struct {
-  Snippets []Snippet `json:"snippets"`
+	Snippets []Snippet `json:"snippets" toml:"snippets"`
 }
 
 type Snippet struct {
-	Description string   `json:"description"`
-	Command     string   `json:"command"`
-	Tag         []string `json:"tag"`
-	Output      string   `json:"output"`
+	Description string   `json:"description" toml:"description"`
+	Command     string   `json:"command" toml:"command"`
+	Tag         []string `json:"tag" toml:"tag"`
+	Output      string   `json:"output" toml:"output"`
 }
-
-
 
 func (s *snippets) ToToml() (string, error) {
 	b, err := toml.Marshal(s)
