@@ -13,6 +13,7 @@ type Args struct {
 	Clean         bool
 	Debug         bool
 	PrintSnippets bool
+	SearchPath    string
 }
 
 var tmpFile = path.Join(os.TempDir(), ".animal-rescue.json.tmp")
@@ -23,6 +24,7 @@ func parseArgs() Args {
 	flag.BoolVar(&args.Clean, "clean", false, "Clean any cached `pet` config files")
 	flag.BoolVar(&args.Debug, "debug", false, "debug")
 	flag.BoolVar(&args.PrintSnippets, "snippets", false, "Print the json representation of snippets")
+	flag.StringVar(&args.SearchPath, "search-path", "", "Search paths for pet snippets")
 	flag.Parse()
 	return args
 }
@@ -52,10 +54,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		slog.Error("Failed to get current working directory %v", ErrAttr(err))
-		panic(err)
+	var cwd string
+	if args.SearchPath == "" {
+		cwd, err = os.Getwd()
+		if err != nil {
+			slog.Error("Failed to get current working directory %v", ErrAttr(err))
+			panic(err)
+		}
+	} else {
+		cwd = args.SearchPath
 	}
 
 	inputConfigPath := args.InputConfig
