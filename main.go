@@ -9,9 +9,10 @@ import (
 )
 
 type Args struct {
-	InputConfig string
-	Clean       bool
-	Debug       bool
+	InputConfig   string
+	Clean         bool
+	Debug         bool
+	PrintSnippets bool
 }
 
 var tmpFile = path.Join(os.TempDir(), ".animal-rescue.json.tmp")
@@ -21,6 +22,7 @@ func parseArgs() Args {
 	flag.StringVar(&args.InputConfig, "config", "", "Input config file")
 	flag.BoolVar(&args.Clean, "clean", false, "Clean any cached `pet` config files")
 	flag.BoolVar(&args.Debug, "debug", false, "debug")
+	flag.BoolVar(&args.PrintSnippets, "snippets", false, "Print the json representation of snippets")
 	flag.Parse()
 	return args
 }
@@ -84,6 +86,15 @@ func main() {
 			panic(err)
 		}
 		allSnips.Snippets = append(allSnips.Snippets, snips.Snippets...)
+	}
+
+	if args.PrintSnippets {
+		json_snippets, err := allSnips.ToJson()
+		if err != nil {
+			slog.Error("Failed to print json snippets %v", ErrAttr(err))
+		}
+		fmt.Println(json_snippets)
+		return
 	}
 
 	tempSnipsFile, err := WriteTempSnippetsFile(&allSnips)

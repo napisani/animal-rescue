@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+
 	"github.com/pelletier/go-toml"
 )
 
@@ -20,6 +22,14 @@ func (s *snippets) ToToml() (string, error) {
 	if err != nil {
 		return "", err
 
+	}
+	return string(b), nil
+}
+
+func (s *snippets) ToJson() (string, error) {
+	b, err := json.Marshal(s)
+	if err != nil {
+		return "", err
 	}
 	return string(b), nil
 }
