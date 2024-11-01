@@ -12,7 +12,8 @@ func (s *SourcePetAdditional) GetSnippets(opts *GetSnippetsOptions) (*snippets, 
 	snips := snippets{}
 	additionalSnipsFile := os.Getenv("PET_ADDL_SNIPPETS")
 	if additionalSnipsFile != "" {
-		return nil, nil
+		s := snippets{}
+		return &s, nil
 	}
 
 	if _, err := os.Stat(additionalSnipsFile); os.IsNotExist(err) {
