@@ -11,7 +11,8 @@ type SourcePetAdditional struct {
 func (s *SourcePetAdditional) GetSnippets(opts *GetSnippetsOptions) (*snippets, error) {
 	snips := snippets{}
 	additionalSnipsFile := os.Getenv("PET_ADDL_SNIPPETS")
-	if additionalSnipsFile != "" {
+	slog.Debug("additionalSnipsFile: %v", additionalSnipsFile)
+	if additionalSnipsFile == "" {
 		s := snippets{}
 		return &s, nil
 	}

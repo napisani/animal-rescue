@@ -90,9 +90,9 @@ func main() {
 		snips, err := src.GetSnippets(&opts)
 		if err != nil {
 			slog.Error("Failed to get snippets %v", ErrAttr(err))
-			panic(err)
+		} else {
+			allSnips.Snippets = append(allSnips.Snippets, snips.Snippets...)
 		}
-		allSnips.Snippets = append(allSnips.Snippets, snips.Snippets...)
 	}
 
 	if args.PrintSnippets {
