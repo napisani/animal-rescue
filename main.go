@@ -84,7 +84,7 @@ func main() {
 	}
 
 	allSnips := snippets{}
-	sources := []SnippetSource{&SourceBase{}, &SourceMake{}, &SourceNpm{}, &SourcePetLocal{}}
+	sources := []SnippetSource{&SourceBase{}, &SourceMake{}, &SourceNpm{}, &SourcePetLocal{}, &SourcePetAdditional{}}
 
 	for _, src := range sources {
 		snips, err := src.GetSnippets(&opts)

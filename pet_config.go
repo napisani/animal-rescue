@@ -1,9 +1,13 @@
 package main
+
 //  this file is from the https://github.com/knqyf263/pet repository.
 
 import (
 	"github.com/pelletier/go-toml"
 )
+
+// Conf is global config variable
+var Conf Config
 
 // Config is a struct of config
 type Config struct {
@@ -16,13 +20,15 @@ type Config struct {
 // GeneralConfig is a struct of general config
 type GeneralConfig struct {
 	SnippetFile string
+	SnippetDirs []string
 	Editor      string
 	Column      int
 	SelectCmd   string
 	Backend     string
 	SortBy      string
 	Color       bool
-	Cmd         []string
+	Format      string
+	// Cmd         []string
 }
 
 // GistConfig is a struct of config for Gist
@@ -83,9 +89,9 @@ func ConfigFromToml(data string) (*Config, error) {
 }
 
 func (c *Config) ToToml() (string, error) {
-  b, err := toml.Marshal(c)
-  if err != nil {
-    return "", err
-  }
-  return string(b), nil
+	b, err := toml.Marshal(c)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }
