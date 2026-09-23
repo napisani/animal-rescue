@@ -1,12 +1,11 @@
 package main
 
 type GetSnippetsOptions struct {
-  Cwd string
-  InputConfig *Config 
-} 
-
-
+	Cwd         string
+	InputConfig *Config
+	ShellPaths  []string
+}
 
 type SnippetSource interface {
-  GetSnippets(*GetSnippetsOptions) (*snippets, error)
+	GetSnippets(*GetSnippetsOptions) (*snippets, error)
 }

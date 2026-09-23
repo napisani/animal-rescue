@@ -14,6 +14,7 @@ type Args struct {
 	Debug         bool
 	PrintSnippets bool
 	SearchPath    string
+	ShellPaths    []string
 }
 
 var tmpFile = path.Join(os.TempDir(), ".animal-rescue.json.tmp")
@@ -25,6 +26,10 @@ func parseArgs() Args {
 	flag.BoolVar(&args.Debug, "debug", false, "debug")
 	flag.BoolVar(&args.PrintSnippets, "snippets", false, "Print the json representation of snippets")
 	flag.StringVar(&args.SearchPath, "search-path", "", "Search paths for pet snippets")
+	flag.Func("shell-path", "Opt in to scanning shell files or directories for # pet: annotations (repeatable)", func(value string) error {
+		args.ShellPaths = append(args.ShellPaths, value)
+		return nil
+	})
 	flag.Parse()
 	return args
 }
@@ -37,12 +42,12 @@ func main() {
 
 	err := DeleteTempSnippetsFile()
 	if err != nil {
-		slog.Error("Failed to delete temp snippets file %v", ErrAttr(err))
+		slog.Error("Failed to delete temp snippets file", ErrAttr(err))
 		panic(err)
 	}
 	err = DeleteTempConfigFile()
 	if err != nil {
-		slog.Error("Failed to delete temp config file %v", ErrAttr(err))
+		slog.Error("Failed to delete temp config file", ErrAttr(err))
 		panic(err)
 	}
 	if args.Clean {
@@ -58,7 +63,7 @@ func main() {
 	if args.SearchPath == "" {
 		cwd, err = os.Getwd()
 		if err != nil {
-			slog.Error("Failed to get current working directory %v", ErrAttr(err))
+			slog.Error("Failed to get current working directory", ErrAttr(err))
 			panic(err)
 		}
 	} else {
@@ -68,28 +73,29 @@ func main() {
 	inputConfigPath := args.InputConfig
 	contents, err := os.ReadFile(inputConfigPath)
 	if err != nil {
-		slog.Error("Failed to read input config file %v", ErrAttr(err))
+		slog.Error("Failed to read input config file", ErrAttr(err))
 		panic(err)
 	}
 
 	inputConfig, err := ConfigFromToml(string(contents))
 	if err != nil {
-		slog.Error("Failed to parse input config file %v", ErrAttr(err))
+		slog.Error("Failed to parse input config file", ErrAttr(err))
 		panic(err)
 	}
 
 	opts := GetSnippetsOptions{
 		Cwd:         cwd,
 		InputConfig: inputConfig,
+		ShellPaths:  args.ShellPaths,
 	}
 
 	allSnips := snippets{}
-	sources := []SnippetSource{&SourceBase{}, &SourceMake{}, &SourceNpm{}, &SourcePetLocal{}, &SourcePetAdditional{}}
+	sources := []SnippetSource{&SourceBase{}, &SourceMake{}, &SourceNpm{}, &SourcePetLocal{}, &SourcePetAdditional{}, &SourceShell{}}
 
 	for _, src := range sources {
 		snips, err := src.GetSnippets(&opts)
 		if err != nil {
-			slog.Error("Failed to get snippets %v", ErrAttr(err))
+			slog.Error("Failed to get snippets", ErrAttr(err))
 		} else {
 			allSnips.Snippets = append(allSnips.Snippets, snips.Snippets...)
 		}
@@ -98,7 +104,7 @@ func main() {
 	if args.PrintSnippets {
 		json_snippets, err := allSnips.ToJson()
 		if err != nil {
-			slog.Error("Failed to print json snippets %v", ErrAttr(err))
+			slog.Error("Failed to print json snippets", ErrAttr(err))
 		}
 		fmt.Println(json_snippets)
 		return
@@ -106,7 +112,7 @@ func main() {
 
 	tempSnipsFile, err := WriteTempSnippetsFile(&allSnips)
 	if err != nil {
-		slog.Error("Failed to write temp snippets file %v", ErrAttr(err))
+		slog.Error("Failed to write temp snippets file", ErrAttr(err))
 		panic(err)
 	}
 
@@ -114,7 +120,7 @@ func main() {
 
 	tempConfigFile, err := WriteTempConfigFile(inputConfig)
 	if err != nil {
-		slog.Error("Failed to write temp config file %v", ErrAttr(err))
+		slog.Error("Failed to write temp config file", ErrAttr(err))
 		panic(err)
 	}
 

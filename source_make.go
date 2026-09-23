@@ -27,14 +27,15 @@ func (s *SourceMake) GetSnippets(opts *GetSnippetsOptions) (*snippets, error) {
 	}
 
 	cmd := exec.Command("make", "-qp")
+	cmd.Dir = opts.Cwd
 	output, err := cmd.Output()
-	slog.Debug("make err %v", ErrAttr(err))
+	slog.Debug("Makefile discovery completed", ErrAttr(err))
 
-  if output == nil  && err != nil {
-    // only return an error if no output was returned
-    // make seems to return a non-zero exit code when printing in question-mode
-    return &snips, err
-  }
+	if output == nil && err != nil {
+		// only return an error if no output was returned
+		// make seems to return a non-zero exit code when printing in question-mode
+		return &snips, err
+	}
 
 	for _, line := range strings.Split(string(output), "\n") {
 		reg := regexp.MustCompile("^[a-zA-Z0-9][^$#\\/\\t=]*:([^=]|$)")
@@ -47,7 +48,7 @@ func (s *SourceMake) GetSnippets(opts *GetSnippetsOptions) (*snippets, error) {
 			if line == "Makefile" {
 				continue
 			}
-			slog.Debug("line: %s", line)
+			slog.Debug("Discovered Makefile target", "target", line)
 			snips.Snippets = append(snips.Snippets, SnippetFromMakeLine(line))
 		}
 	}

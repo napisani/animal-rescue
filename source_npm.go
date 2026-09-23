@@ -24,22 +24,22 @@ func (s *SourceNpm) GetSnippets(opts *GetSnippetsOptions) (*snippets, error) {
 	isPnpm := DoesFileExistAtRoot(opts.Cwd, "pnpm-lock.yaml")
 
 	if _, err := os.Stat(f); os.IsNotExist(err) {
-		slog.Debug("Snippet file does not exist: %v %v", f, err)
+		slog.Debug("Package file does not exist", "file", f, ErrAttr(err))
 		return &snips, nil
 	} else if err != nil {
-		slog.Debug("Error checking snippet file: %v %v", f, err)
+		slog.Debug("Failed to check package file", "file", f, ErrAttr(err))
 		return nil, err
 	}
 
 	contents, err := os.ReadFile(f)
 	if err != nil {
-		slog.Debug("Error reading snippet file: %v %v", f, err)
+		slog.Debug("Failed to read package file", "file", f, ErrAttr(err))
 		return nil, err
 	}
 	p := PackageJson{}
 	err = json.Unmarshal(contents, &p)
 	if err != nil {
-		slog.Debug("Error unmarshalling package.json: %v", err)
+		slog.Debug("Failed to parse package.json", ErrAttr(err))
 		return nil, err
 	}
 	return SnippetsFromPackageJson(p, isPnpm), nil

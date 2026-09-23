@@ -1,10 +1,28 @@
-all: build 
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+GIT_COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+LDFLAGS := -X 'main.Version=$(VERSION)' \
+           -X 'main.GitCommit=$(GIT_COMMIT)' \
+           -X 'main.BuildDate=$(BUILD_DATE)'
+
+all: build
 
 build:
-	go build -o animal-rescue .
+	go build -ldflags "$(LDFLAGS)" -o animal-rescue .
 
 test:
 	go test -v ./...
 
 clean:
-	rm -f animal-rescue 
+	rm -f animal-rescue
+
+install:
+	go install -ldflags "$(LDFLAGS)" .
+
+# Recompute flake.nix's vendorHash after a go.mod/go.sum change (see
+# scripts/update-vendor-hash.sh for how).
+update-vendor-hash:
+	./scripts/update-vendor-hash.sh
+
+.PHONY: all build test clean install update-vendor-hash
